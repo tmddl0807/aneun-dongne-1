@@ -7,7 +7,8 @@ import { token } from "../../recoil/recoil";
 import KakaoLogin from "./KakaoLogin";
 
 const ModalLogin = ({ handleResponseSuccess, ToSignupModal, closeLoginModalHandler }) => {
-  const setAccessToken = useSetRecoilState(token);
+  // const setAccessToken = useSetRecoilState(token);
+  const [accesstoken, setAccesstoken] = useState("");
   const [loginInfo, setLoginInfo] = useState({
     email: "",
     password: "",
@@ -17,6 +18,33 @@ const ModalLogin = ({ handleResponseSuccess, ToSignupModal, closeLoginModalHandl
   const { email, password } = loginInfo;
   const handleInputValue = (key) => (e) => {
     setLoginInfo({ ...loginInfo, [key]: e.target.value });
+  };
+
+  const onSilentRefresh = () => {
+    axios
+      .post(`${process.env.REACT_APP_API_URL}/user/silent-refresh`, {})
+      .then(onLoginSuccess)
+      .then(() => {
+        handleResponseSuccess();
+        window.localStorage.setItem("jwt", "일반로긴"); //여기서 담고
+      })
+      .catch((error) => {
+        console.log(error);
+        setErrorMessage(message.loginError);
+        // ... 로그인 실패 처리
+      });
+  };
+
+  const onLoginSuccess = (response) => {
+    console.log(response);
+    const { accessToken } = response.data.data;
+    setAccesstoken(accessToken);
+
+    // accessToken 설정
+    axios.defaults.headers.common["Authorization"] = `Bearer ${accesstoken}`;
+    const JWT_EXPIRY_TIME = 30 * 60 * 1000; // 만료 시간 (24시간 밀리 초로 표현)
+    // accessToken 만료하기 1분 전에 로그인 연장
+    setTimeout(onSilentRefresh, JWT_EXPIRY_TIME - 60000);
   };
 
   const handleLogin = async () => {
@@ -37,8 +65,8 @@ const ModalLogin = ({ handleResponseSuccess, ToSignupModal, closeLoginModalHandl
         },
         { "Content-Type": "application/json", withCredentials: true }
       )
-      .then((res) => {
-        setAccessToken(res.data.data.accessToken);
+      .then(onLoginSuccess)
+      .then(() => {
         closeLoginModalHandler();
       })
       .then(() => {

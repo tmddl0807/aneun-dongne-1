@@ -7,5 +7,4 @@ module.exports = (req, res) => {
     sameSite: "None",
   });
   res.status(205).send("Logged out successfully");
-  // res.redirect(`${process.env.MAIN_URL}`);
 };

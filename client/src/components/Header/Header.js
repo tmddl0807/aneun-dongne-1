@@ -17,13 +17,12 @@ import WarningDeleteUserModal from "../ModalWarningDeleteUserInfo/WarningDeleteU
 import ModalSavePosition from "../ModalSavePosition/ModalSavePosition";
 import axios from "axios";
 import { Link, useHistory } from "react-router-dom";
-
 import Cookies from "universal-cookie";
 import SaveOrNotModal from "../ModalSaveOrNot/SaveOrNotModal";
 import ModalLoginAgain from "../ModalLoginAgain/ModalLoginAgain";
 import HomeRightbar from "../HomeSearchBar/Home-Rightbar-index";
 
-const Header = ({ handleResponseSuccess }) => {
+const Header = ({ handleResponseSuccess, onLogin }) => {
   const cookies = new Cookies();
   const history = useHistory();
   const [isLoginOpen, setIsLoginOpen] = useRecoilState(loginModal);
@@ -126,6 +125,7 @@ const Header = ({ handleResponseSuccess }) => {
                   handleResponseSuccess={handleResponseSuccess}
                   ToSignupModal={ToSignupModal}
                   closeLoginModalHandler={closeLoginModalHandler}
+                  onLogin={onLogin}
                 />
               </Styled.ModalView>
             </Styled.ModalBackdrop>

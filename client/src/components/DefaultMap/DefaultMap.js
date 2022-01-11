@@ -75,11 +75,11 @@ function DefaultMap() {
     }
     const imageSrc = "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png";
 
-    let markerCenter = new kakao.maps.Marker({
-      // 지도 중심좌표에 마커를 생성합니다
-      position: kakaoMap.getCenter(),
-      map: kakaoMap,
-    });
+    // let markerCenter = new kakao.maps.Marker({
+    //   // 지도 중심좌표에 마커를 생성합니다
+    //   position: kakaoMap.getCenter(),
+    //   map: kakaoMap,
+    // });
 
     let bounds = new kakao.maps.LatLngBounds();
 
@@ -163,13 +163,13 @@ function DefaultMap() {
     // placeList.setMap(kakaoMap);
 
     // 중심좌표 마커에 클릭이벤트를 등록합니다
-    kakao.maps.event.addListener(markerCenter, "click", function () {
-      // 마커 위에 인포윈도우를 표시합니다
-      infowindowCenter.open(kakaoMap, markerCenter);
-    });
+    // kakao.maps.event.addListener(markerCenter, "click", function () {
+    //   // 마커 위에 인포윈도우를 표시합니다
+    //   infowindowCenter.open(kakaoMap, markerCenter);
+    // });
 
     // kakao.maps.event.addListener(map, "click", function (mouseEvent) {
-    kakao.maps.event.addListener(kakaoMap, "dragend", function (mouseEvent) {
+    kakao.maps.event.addListener(kakaoMap, "click", function (mouseEvent) {
       if (container === null) {
         return;
       }
@@ -181,12 +181,12 @@ function DefaultMap() {
       setAbleToSearchPlace(true);
       console.log("드래그");
       // ? 클릭한 위도, 경도 정보를 가져옵니다
-      // let latlng = mouseEvent.latLng;
-      let latlng = kakaoMap.getCenter();
+      let latlng = mouseEvent.latLng;
+      // let latlng = kakaoMap.getCenter();
 
       setDefaultPosition({ lat: latlng.Ma, lon: latlng.La });
       //?  마커 위치를 클릭한 위치로 옮깁니다
-      markerCenter.setPosition(latlng);
+      // markerCenter.setPosition(latlng);
     });
 
     setPlaceListLoading(false);

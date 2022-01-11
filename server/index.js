@@ -48,6 +48,7 @@ app.delete("/visited", controllers.deleteVisited);
 
 app.post("/user/signup", controllers.signup);
 app.post("/user/login", controllers.signin);
+app.post("/user/silent-refresh", controllers.silentRefresh);
 
 app.get("/user/kakao/callback", controllers.kakaoCallBack);
 app.get("/signout", controllers.kakaoSignout);

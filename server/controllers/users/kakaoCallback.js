@@ -1,5 +1,5 @@
 const axios = require("axios");
-const { generateAccessToken, sendAccessToken } = require("../tokenFunctions");
+const { generateAccessToken, sendAccessToken, sendKakaoRefreshToken } = require("../tokenFunctions");
 const { User } = require("../../models");
 module.exports = async (req, res) => {
   axios
@@ -45,37 +45,49 @@ module.exports = async (req, res) => {
                   },
                 }).then((data) => {
                   delete data.dataValues.password;
+                  data.dataValues.tokenCreated = new Date();
+
+                  let date = new Date();
+                  let expiresDate = date.setDate(date.getDate() + 7);
+
+                  const refreshToken = generateRefreshToken(expiresDate);
                   const accessToken = generateAccessToken(data.dataValues);
-                  // res.cookie("jwt", accessToken, {
-                  res.cookie("kakao-jwt", accessToken, {
-                    // maxAge: 1000 * 60 * 60 * 24 * 7,
-                    // domain: ".aneun-dongne.com",
-                    httpOnly: true,
-                    path: "/",
-                    secure: true,
-                    sameSite: "none",
-                  }); //토큰 담은 쿠키 전달
-                  // res.redirect(`${process.env.URL_AFTER_LOGIN}`); //로그인 후 이동할 페이지 : MAIN_URL
+                  User.update(
+                    {
+                      refresh_token: refreshToken,
+                    },
+                    {
+                      where: {
+                        id: data.dataValues.id,
+                      },
+                    }
+                  );
+                  sendKakaoRefreshToken(res, refreshToken);
                   sendAccessToken(res, accessToken);
-                  // 로그인 인증 완료});
                 });
               });
             } // 카톡 프사, 닉네임 등등이 바뀌면 여기도 자동으로 바뀌어야 해서
             else {
               delete save.dataValues.password;
+              save.dataValues.tokenCreated = new Date();
+
+              let date = new Date();
+              let expiresDate = date.setDate(date.getDate() + 7);
+
+              const refreshToken = generateRefreshToken(expiresDate);
               const accessToken = generateAccessToken(save.dataValues);
-              // res.cookie("jwt", accessToken, {
-              res.cookie("kakao-jwt", accessToken, {
-                // maxAge: 1000 * 60 * 60 * 24 * 7,
-                // domain: ".aneun-dongne.com",
-                httpOnly: true,
-                path: "/",
-                secure: true,
-                sameSite: "none",
-              }); //토큰 담은 쿠키 전달
-              // res.redirect(`${process.env.URL_AFTER_LOGIN}`); //로그인 후 이동할 페이지 : MAIN_URL
+              User.update(
+                {
+                  refresh_token: refreshToken,
+                },
+                {
+                  where: {
+                    id: save.dataValues.id,
+                  },
+                }
+              );
+              sendKakaoRefreshToken(res, refreshToken);
               sendAccessToken(res, accessToken);
-              // 로그인 인증 완료
             }
           });
         });
