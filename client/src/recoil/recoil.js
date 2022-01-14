@@ -4,11 +4,18 @@ import Cookies from "universal-cookie";
 const cookies = new Cookies();
 export const token = atom({
   key: "token",
-  default: cookies.get("jwt"),
+  // default: cookies.get("jwt"),
+  default: "",
 });
 export const kToken = atom({
   key: "kToken",
-  default: cookies.get("kakao-jwt"),
+  // default: cookies.get("kakao-jwt"),
+  default: "",
+});
+
+export const accesstoken = atom({
+  key: "accessToken",
+  default: "",
 });
 
 //! 유저 주소 - Home.js, savePositioModal 에서 사용

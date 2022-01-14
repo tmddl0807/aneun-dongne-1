@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useSetRecoilState } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { Styled } from "./style";
 import { message } from "../../modules/message";
-import { token } from "../../recoil/recoil";
+import { token, accesstoken, userInfo } from "../../recoil/recoil";
 import KakaoLogin from "./KakaoLogin";
 
-const ModalLogin = ({ handleResponseSuccess, ToSignupModal, closeLoginModalHandler }) => {
-  const setAccessToken = useSetRecoilState(token);
+const ModalLogin = ({ ToSignupModal, closeLoginModalHandler, onLogin }) => {
+  const [accessToken, setAccessToken] = useRecoilState(accesstoken);
   const [loginInfo, setLoginInfo] = useState({
     email: "",
     password: "",
@@ -18,6 +18,7 @@ const ModalLogin = ({ handleResponseSuccess, ToSignupModal, closeLoginModalHandl
   const handleInputValue = (key) => (e) => {
     setLoginInfo({ ...loginInfo, [key]: e.target.value });
   };
+  const setInfo = useSetRecoilState(userInfo);
 
   const handleLogin = async () => {
     if (email === "") {
@@ -28,26 +29,7 @@ const ModalLogin = ({ handleResponseSuccess, ToSignupModal, closeLoginModalHandl
       return;
     }
 
-    await axios
-      .post(
-        `${process.env.REACT_APP_API_URL}/user/login`,
-        {
-          email,
-          password,
-        },
-        { "Content-Type": "application/json", withCredentials: true }
-      )
-      .then((res) => {
-        setAccessToken(res.data.data.accessToken);
-        closeLoginModalHandler();
-      })
-      .then(() => {
-        handleResponseSuccess();
-        window.localStorage.setItem("jwt", "일반로긴"); //여기서 담고
-      })
-      .catch(() => {
-        setErrorMessage(message.loginError);
-      });
+    onLogin(email, password);
   };
 
   return (

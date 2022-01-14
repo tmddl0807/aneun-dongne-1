@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import LikeLists from "./LikeLists.js";
-import { useRecoilValue } from "recoil";
-import { token, kToken } from "../../recoil/recoil";
+import { useRecoilValue, useRecoilState } from "recoil";
+import { token, kToken, accesstoken } from "../../recoil/recoil";
 
 import styled from "styled-components";
 
@@ -21,17 +21,16 @@ const List = styled.div`
 `;
 
 const MyLike = () => {
-  const accessToken = useRecoilValue(token);
   const [postsInfo, setPostsInfo] = useState([]);
   const [isLoing, setIsloading] = useState(true);
-  const kakaoToken = useRecoilValue(kToken);
   const cookies = new Cookies();
+  const [accessToken, setAccessToken] = useRecoilState(accesstoken);
 
   const renderMyLike = async () => {
     await axios
       .get(`${process.env.REACT_APP_API_URL}/mypage/likelists`, {
         headers: {
-          Authorization: `Bearer ${cookies.get("jwt") || cookies.get("kakao-jwt")}`,
+          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         withCredentials: "true",

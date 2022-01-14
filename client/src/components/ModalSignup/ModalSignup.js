@@ -1,12 +1,19 @@
 import React, { useState } from "react";
 import axios from "axios";
-
+import { useRecoilState } from "recoil";
 import { valid } from "../../modules/validator";
 import { message } from "../../modules/message";
-
+import { token, accesstoken } from "../../recoil/recoil";
 import { Styled } from "../ModalSignup/style";
 
-const ModalSignup = ({ handleResponseSuccess, ToLoginModal, closeLogoutModalHandler }) => {
+const ModalSignup = ({
+  handleResponseSuccess,
+  ToLoginModal,
+  closeLogoutModalHandler,
+  onSignUp,
+  onSilentRefresh,
+  setTimeSilentRefresh,
+}) => {
   const [userInfo, setUserInfo] = useState({
     nickname: "",
     email: "",
@@ -23,6 +30,8 @@ const ModalSignup = ({ handleResponseSuccess, ToLoginModal, closeLogoutModalHand
     passwordConfirm: "",
     confirm: "",
   });
+
+  const [accessToken, setAccessToken] = useRecoilState(accesstoken);
 
   const handleInputValue = (key) => (e) => {
     setUserInfo({ ...userInfo, [key]: e.target.value });
@@ -70,28 +79,7 @@ const ModalSignup = ({ handleResponseSuccess, ToLoginModal, closeLogoutModalHand
       return;
     }
 
-    axios
-      .post(
-        `${process.env.REACT_APP_API_URL}/user/signup`,
-        {
-          nickname,
-          email,
-          password,
-          user_image_path,
-          user_thumbnail_path,
-        },
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        }
-      )
-      .then((res) => {
-        console.log(res);
-        closeLogoutModalHandler();
-        window.localStorage.setItem("jwt", "일반로긴");
-        handleResponseSuccess();
-      })
-      .catch((err) => console.log(err.response));
+    onSignUp(nickname, email, password, user_image_path, user_thumbnail_path);
   };
 
   return (

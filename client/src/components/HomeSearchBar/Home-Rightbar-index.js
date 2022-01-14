@@ -15,6 +15,7 @@ import {
   searcnPlaceBtnPressed,
   setPlacelistLoading,
   usersaddress,
+  accesstoken,
 } from "../../recoil/recoil";
 import HomeRightBtn from "../HomeSearchBtn/HomeRightBtn-index";
 
@@ -29,7 +30,7 @@ function HomeRightbar() {
   const [add, setAdd] = useRecoilState(usersaddress);
   const [areaIdx, setAreaIdx] = useState(0);
   const cookies = new Cookies();
-
+  const [accessToken, setAccessToken] = useRecoilState(accesstoken);
   const [area, setArea] = useRecoilState(usersArea);
   const [sigg, setSigg] = useRecoilState(usersSigg);
   const [place, setPlace] = useState("");
@@ -82,8 +83,7 @@ function HomeRightbar() {
     axios
       .get(`${process.env.REACT_APP_API_URL}/home`, {
         headers: {
-          Authorization: `Bearer ${cookies.get("jwt") || cookies.get("kakao-jwt")}`,
-          // Authorization: `Bearer ${accessToken || kakaoToken}`,
+          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         params: {

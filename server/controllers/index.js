@@ -8,6 +8,7 @@ module.exports = {
   signup: require("./users/signup"),
   signin: require("./users/signin"),
   signout: require("./users/signout"),
+  silentRefresh: require("./users/silentRefresh"),
   //kakao
   kakaoCallBack: require("./users/kakaoCallback"),
   kakaoSignout: require("./users/kakaoSignout.js"),

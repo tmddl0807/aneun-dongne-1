@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 
 import { Styled } from "./style";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import { token, kToken, loginModal } from "../../recoil/recoil";
+import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
+import { token, kToken, loginModal, accesstoken } from "../../recoil/recoil";
 
 import EditableHashTag from "../EditableHashTag/EditableHashTag";
 import axios from "axios";
@@ -12,8 +12,7 @@ import { defaultcomments } from "../../recoil/detailpage";
 
 function Comments({ uuid, img, nickname, text, initialTags, date, editable, contentId }) {
   const [clickedBtn, setClickedBtn] = useState("");
-  const accessToken = useRecoilValue(token);
-  const kakaoToken = useRecoilValue(kToken);
+  const [accessToken, setAccessToken] = useRecoilState(accesstoken);
   //editMode가 전역변수면 모든댓글창이 영향을받는다.
   const [editMode, setEditMode] = useState(false);
   const [comment, setComment] = useState("");
@@ -58,7 +57,7 @@ function Comments({ uuid, img, nickname, text, initialTags, date, editable, cont
           `${process.env.REACT_APP_API_URL}/comment/${contentId}`,
           {
             headers: {
-              // Authorization: `Bearer ${accessToken || kakaoToken}`,
+              Authorization: `Bearer ${accessToken}`,
               "Content-Type": "application/json",
             },
             withCredentials: true,
@@ -95,7 +94,7 @@ function Comments({ uuid, img, nickname, text, initialTags, date, editable, cont
       await axios
         .patch(`${process.env.REACT_APP_API_URL}/comment/${contentId}`, body, {
           headers: {
-            Authorization: `Bearer ${accessToken || kakaoToken}`,
+            Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json",
           },
           withCredentials: true,

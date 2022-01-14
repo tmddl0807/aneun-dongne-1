@@ -7,7 +7,7 @@ import HashTagTemplate from "../../components/HashTagTemplate/HashTagTemplate";
 import CommentTemplate from "../../components/CommentTemplate/CommentTemplate";
 import MyComment from "../../components/MyComment/MyComment";
 import { selector, useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { loginState, token, kToken, loginModal, loginAgainModal } from "../../recoil/recoil";
+import { loginState, token, kToken, loginModal, loginAgainModal, accesstoken } from "../../recoil/recoil";
 import { contentid, defaultcomments, hashTagSelector } from "../../recoil/detailpage";
 
 import LikeLoading from "../../components/Loading/LikeLoading";
@@ -36,8 +36,7 @@ function DetailPage({ match }) {
   const [defaultComment, setDefaultComment] = useRecoilState(defaultcomments);
   const [like, setLike] = useState(0); //나중에 서버로부터 받아오게 된다.
   const [likeOrNot, setLikeOrNot] = useState(false); //이것도 서버에서 받아와야함
-  const accessToken = useRecoilValue(token);
-  const kakaoToken = useRecoilValue(kToken);
+  const [accessToken, setAccessToken] = useRecoilState(accesstoken);
   //비로그인 아닌데 토큰만료되면 로그아웃유도
   const setIsLoginAgainOpen = useSetRecoilState(loginAgainModal);
   //로딩창
@@ -50,7 +49,7 @@ function DetailPage({ match }) {
       .get(`${process.env.REACT_APP_API_URL}/post/${contentId}`, {
         headers: {
           // Authorization: `Bearer ${cookies.get("jwt") || cookies.get("kakao-jwt")}`,
-          // Authorization: `Bearer ${accessToken || kakaoToken}`,
+          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         withCredentials: true,
@@ -79,7 +78,7 @@ function DetailPage({ match }) {
       .get(`${process.env.REACT_APP_API_URL}/post/${contentId}`, {
         headers: {
           // Authorization: `Bearer ${cookies.get("jwt") || cookies.get("kakao-jwt")}`,
-          // Authorization: `Bearer ${accessToken || kakaoToken}`,
+          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         withCredentials: true,
@@ -94,7 +93,7 @@ function DetailPage({ match }) {
       .get(`${process.env.REACT_APP_API_URL}/comment/${contentId}`, {
         headers: {
           // Authorization: `Bearer ${cookies.get("jwt") || cookies.get("kakao-jwt")}`,
-          // Authorization: `Bearer ${accessToken || kakaoToken}`,
+          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         withCredentials: true,
@@ -118,7 +117,7 @@ function DetailPage({ match }) {
     axios
       .get(`${process.env.REACT_APP_API_URL}/like/${contentId}`, {
         headers: {
-          Authorization: `Bearer ${accessToken || kakaoToken}`,
+          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         withCredentials: true,
@@ -155,7 +154,7 @@ function DetailPage({ match }) {
           {},
           {
             headers: {
-              Authorization: `Bearer ${accessToken || kakaoToken}`,
+              Authorization: `Bearer ${accessToken}`,
               "Content-Type": "application/json",
             },
             withCredentials: true,
@@ -175,7 +174,7 @@ function DetailPage({ match }) {
       axios
         .delete(`${process.env.REACT_APP_API_URL}/like/${contentId}`, {
           headers: {
-            Authorization: `Bearer ${accessToken || kakaoToken}`,
+            Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json",
           },
           withCredentials: true,

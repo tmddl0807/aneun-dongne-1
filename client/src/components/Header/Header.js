@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useRecoilState } from "recoil";
+import React, { useEffect, useState } from "react";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import ModalLogin from "../ModalLogin/ModalLogin";
 import ModalSignup from "../ModalSignup/ModalSignup";
 import { Styled } from "./style";
@@ -12,19 +12,23 @@ import {
   loginAgainModal,
   warningDeleteUserModal,
   searchPlaceModal,
+  accesstoken,
+  userInfo,
 } from "../../recoil/recoil";
 import WarningDeleteUserModal from "../ModalWarningDeleteUserInfo/WarningDeleteUserInfo";
 import ModalSavePosition from "../ModalSavePosition/ModalSavePosition";
 import axios from "axios";
 import { Link, useHistory } from "react-router-dom";
-
 import Cookies from "universal-cookie";
 import SaveOrNotModal from "../ModalSaveOrNot/SaveOrNotModal";
 import ModalLoginAgain from "../ModalLoginAgain/ModalLoginAgain";
 import HomeRightbar from "../HomeSearchBar/Home-Rightbar-index";
+import { message } from "../../modules/message";
 
-const Header = ({ handleResponseSuccess }) => {
+const Header = () => {
   const cookies = new Cookies();
+  // const setAccessToken = useSetRecoilState(accessToken);
+  const [accessToken, setAccessToken] = useRecoilState(accesstoken);
   const history = useHistory();
   const [isLoginOpen, setIsLoginOpen] = useRecoilState(loginModal);
   const [isSignupOpen, setIsSignupOpen] = useState(false);
@@ -34,6 +38,129 @@ const Header = ({ handleResponseSuccess }) => {
   const [isLoginAgainOpen, setIsLoginAgainOpen] = useRecoilState(loginAgainModal);
   const [isWarningModal, setWarningModal] = useRecoilState(warningDeleteUserModal);
   const [isOpenSearchPlaceModal, setIsOpenSearchPlaceModal] = useRecoilState(searchPlaceModal);
+  const [errorMessage, setErrorMessage] = useState("");
+  const setInfo = useSetRecoilState(userInfo);
+
+  // useEffect(() => {
+  //   // if (cookies.get("jwt") || cookies.get("kakao-jwt")) {
+  //   if (window.localStorage.getItem("jwt")) {
+  //     //조회
+  //     onSilentRefresh();
+  //   } else {
+  //     setIsLogin(false);
+  //   }
+  // }, []);
+
+  const setTimeSilentRefresh = () => {
+    // accessToken 만료하기 1분 전에 로그인 연장
+    setTimeout(onSilentRefresh(), 1740000);
+    console.log("시간");
+  };
+
+  const onLogin = (email, password) => {
+    axios
+      .post(
+        `${process.env.REACT_APP_API_URL}/user/login`,
+        {
+          email,
+          password,
+        },
+        { "Content-Type": "application/json", withCredentials: true }
+      )
+      .then((res) => {
+        if (res.status === 201) {
+          setAccessToken(res.data.data.accessToken);
+          setInfo(res.data.data.userInfo);
+          setIsLogin(true);
+          window.localStorage.setItem("jwt", "일반로긴"); //여기서 담고
+          closeLoginModalHandler();
+        }
+      })
+      .then(() => {
+        setTimeSilentRefresh();
+      })
+      .catch(() => {
+        setErrorMessage(message.loginError);
+      });
+  };
+
+  const onSignUp = (nickname, email, password, user_image_path, user_thumbnail_path) => {
+    axios
+      .post(
+        `${process.env.REACT_APP_API_URL}/user/signup`,
+        {
+          nickname,
+          email,
+          password,
+          user_image_path,
+          user_thumbnail_path,
+        },
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        }
+      )
+      .then((res) => {
+        if (res.status === 201) {
+          setAccessToken(res.data.data.accessToken);
+          setInfo(res.data.data.userInfo);
+          setIsLogin(true);
+          window.localStorage.setItem("jwt", "일반로긴"); //여기서 담고
+          closeSignupModalHandler();
+        }
+      })
+      .then(() => {
+        setTimeSilentRefresh();
+      })
+      .catch(() => {
+        setErrorMessage(message.loginError);
+      });
+  };
+
+  const onSilentRefresh = () => {
+    axios
+      .get(`${process.env.REACT_APP_API_URL}/user/silent-refresh`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      })
+      .then((res) => {
+        if (res.status === 201) {
+          setAccessToken(res.data.data.accessToken);
+          setInfo(res.data.data.userInfo);
+          setIsLogin(true);
+        }
+      })
+      .then(() => {
+        setTimeSilentRefresh();
+      })
+      .catch(() => {
+        setErrorMessage(message.unauthorized);
+      });
+  };
+  // const isAuthenticated = async () => {
+  //   console.log("isAuthenticated Accesstoken", accessToken);
+  //   await axios
+  //     .get(`${process.env.REACT_APP_API_URL}/user/info`, {
+  //       headers: {
+  //         // Authorization: `Bearer ${cookies.get("jwt") || cookies.get("kakao-jwt")}`,
+  //         Authorization: `Bearer ${accessToken}`,
+  //         "Content-Type": "application/json",
+  //       },
+  //       withCredentials: true,
+  //     })
+  //     .then((res) => {
+  //       console.log("로그인성공", res);
+  //       setInfo(res.data.data.userInfo);
+  //       setIsLogin(true);
+  //     });
+  // };
+
+  // const handleResponseSuccess = () => {
+  //   isAuthenticated();
+  // };
 
   const openLoginModalHandler = (e) => {
     if (isLoginOpen) {
@@ -123,9 +250,11 @@ const Header = ({ handleResponseSuccess }) => {
             <Styled.ModalBackdrop onClick={closeLoginModalHandler}>
               <Styled.ModalView onClick={(e) => e.stopPropagation()}>
                 <ModalLogin
-                  handleResponseSuccess={handleResponseSuccess}
                   ToSignupModal={ToSignupModal}
                   closeLoginModalHandler={closeLoginModalHandler}
+                  onLogin={onLogin}
+                  onSilentRefresh={onSilentRefresh}
+                  setTimeSilentRefresh={setTimeSilentRefresh}
                 />
               </Styled.ModalView>
             </Styled.ModalBackdrop>
@@ -139,9 +268,11 @@ const Header = ({ handleResponseSuccess }) => {
             <Styled.ModalBackdrop onClick={closeSignupModalHandler}>
               <Styled.ModalView onClick={(e) => e.stopPropagation()}>
                 <ModalSignup
-                  handleResponseSuccess={handleResponseSuccess}
                   ToLoginModal={ToLoginModal}
                   closeLogoutModalHandler={closeLogoutModalHandler}
+                  onSignUp={onSignUp}
+                  onSilentRefresh={onSilentRefresh}
+                  setTimeSilentRefresh={setTimeSilentRefresh}
                 />
               </Styled.ModalView>
             </Styled.ModalBackdrop>

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
-import { useRecoilValue } from "recoil";
-import { token, kToken } from "../../recoil/recoil";
+import { useRecoilValue, useRecoilState } from "recoil";
+import { token, kToken, accesstoken } from "../../recoil/recoil";
 
 import { Icon } from "react-icons-kit";
 import { ic_cancel_outline } from "react-icons-kit/md/ic_cancel_outline";
@@ -13,7 +13,7 @@ import Cookies from "universal-cookie";
 import LikeLoading from "../Loading/LikeLoading";
 
 const MyReviewComment = ({ comment, renderMyComments }) => {
-  const accessToken = useRecoilValue(token);
+  const [accessToken, setAccessToken] = useRecoilState(accesstoken);
   const kakaoToken = useRecoilValue(kToken);
   const [isLoing, SetIsloading] = useState(false);
 
@@ -36,7 +36,7 @@ const MyReviewComment = ({ comment, renderMyComments }) => {
     await axios
       .delete(`${process.env.REACT_APP_API_URL}/comment/${comment_post_contentid}`, {
         headers: {
-          Authorization: `Bearer ${cookies.get("jwt") || cookies.get("kakao-jwt")}`,
+          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         withCredentials: true,

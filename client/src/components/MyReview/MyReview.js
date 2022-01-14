@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-import { useRecoilValue } from "recoil";
-import { token, kToken } from "../../recoil/recoil";
+import { useRecoilValue, useRecoilState } from "recoil";
+import { token, kToken, accesstoken } from "../../recoil/recoil";
 
 import MyReviewComment from "../MyReviewComment/MyReviewComment";
 import LikeLoading from "../Loading/LikeLoading";
@@ -10,8 +10,7 @@ import Empty from "../Empty/Empty";
 import Cookies from "universal-cookie";
 
 const MyReview = () => {
-  const accessToken = useRecoilValue(token);
-  const kakaoToken = useRecoilValue(kToken);
+  const [accessToken, setAccessToken] = useRecoilState(accesstoken);
   const [comments, SetComments] = useState([]);
   const [isLoing, SetIsloading] = useState(true);
   const cookies = new Cookies();
@@ -20,7 +19,7 @@ const MyReview = () => {
     await axios
       .get(`${process.env.REACT_APP_API_URL}/mypage/commentlists`, {
         headers: {
-          Authorization: `Bearer ${cookies.get("jwt") || cookies.get("kakao-jwt")}`,
+          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         withCredentials: true,
