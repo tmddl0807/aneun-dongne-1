@@ -1,9 +1,18 @@
 const { User } = require("../../models");
-const { generateAccessToken, sendAccessToken } = require("../tokenFunctions");
+const {
+  isRefreshAuthorized,
+  generateAccessToken,
+  generateRefreshToken,
+  sendAccessToken,
+  sendRefreshToken,
+} = require("../tokenFunctions");
+require("dotenv").config();
+const { sign, verify } = require("jsonwebtoken");
 
 module.exports = (req, res) => {
   const { email, password } = req.body;
   User.findOne({
+    raw: true,
     where: {
       email,
       password,
@@ -13,20 +22,40 @@ module.exports = (req, res) => {
       if (!data) {
         res.status(404).send("invalid user");
       } else {
-        delete data.dataValues.password;
-        const accessToken = generateAccessToken(data.dataValues);
-        res.cookie("jwt", accessToken, {
-          maxAge: 1000 * 60 * 60 * 24 * 7,
-          // domain: ".aneun-dongne.com",
-          // httpOnly: true,
-          path: "/",
-          secure: true,
-          sameSite: "None",
-        });
-        sendAccessToken(res, accessToken);
+        delete data.password;
+        data.tokenCreated = new Date();
+
+        let date = new Date();
+        let expiresDate = date.setDate(date.getDate() + 7);
+        const userInfo = data;
+
+        const accessToken = generateAccessToken(data);
+        const refreshToken = generateRefreshToken({ expiresDate: expiresDate });
+        const verifyRefreshToken = verify(refreshToken, process.env.REFRESH_SECRET);
+        const jsonRefreshToken = JSON.stringify(verifyRefreshToken);
+        console.log("refresh", refreshToken);
+        console.log("refresh-r", verifyRefreshToken);
+        console.log("refresh-re", jsonRefreshToken);
+        console.log("refresh-rer", JSON.parse(jsonRefreshToken));
+        console.log("refresh-rer", data.id);
+
+        User.update(
+          {
+            refresh_token: String(jsonRefreshToken),
+          },
+          {
+            where: {
+              id: data.id,
+            },
+          }
+        );
+
+        sendRefreshToken(res, refreshToken);
+        sendAccessToken(res, accessToken, userInfo);
       }
     })
     .catch((err) => {
       console.log(err);
+      res.status(500).send("server err");
     });
 };

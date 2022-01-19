@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useSetRecoilState, useRecoilValue, useRecoilValueLoadable } from "recoil";
+import { useSetRecoilState, useRecoilValue, useRecoilValueLoadable, useRecoilState } from "recoil";
 import { Styled } from "./style";
 import { MemoCards } from "../PlaceCard/PlaceCards";
 
@@ -22,8 +22,6 @@ import LikeLoading from "../Loading/LikeLoading";
 
 function PlaceList({ height }) {
   const ableToSearchPlace = useRecoilValue(canSearchPlace);
-  const accessToken = useRecoilValue(token);
-  const kakaoToken = useRecoilValue(kToken);
   const placeList = useRecoilValue(placelist);
   // const visitedList = useRecoilValueLoadable(placelist);
   const setPlaceLocation = useSetRecoilState(placelocation);

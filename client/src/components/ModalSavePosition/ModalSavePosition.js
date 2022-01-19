@@ -13,6 +13,7 @@ import {
   savedVisitedPlaceInMyPage,
   fromMyPage,
   newVisitedPlace,
+  accesstoken,
 } from "../../recoil/recoil";
 import { Styled } from "./style";
 import ImageUpload from "../ImageUpload/ImageUpload";
@@ -21,8 +22,9 @@ import { message } from "../../modules/message";
 
 const ModalSavePosition = () => {
   const [isSaveOrNotModal, setIsSaveOrNotModal] = useRecoilState(saveOrNotModal);
-  const accessToken = useRecoilValue(token);
-  const kakaoToken = useRecoilValue(kToken);
+  // const accessToken = useRecoilValue(token);
+  // const kakaoToken = useRecoilValue(kToken);
+  const [accessToken, setAccessToken] = useRecoilState(accesstoken);
   const [savedPlaceInMyPage, setSavedPlaceInMyPage] = useRecoilState(savedVisitedPlaceInMyPage);
   const [isSavePositionOpen, setIsSavePositionOpen] = useRecoilState(isSavepositionOpen);
   const [image, setImage] = useState(""); //전역으로 바꿀수도
@@ -76,7 +78,7 @@ const ModalSavePosition = () => {
     axios
       .post(`${process.env.REACT_APP_API_URL}/visited`, formData, {
         headers: {
-          // Authorization: `Bearer ${accessToken || kakaoToken}`,
+          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         withCredentials: true,

@@ -2,7 +2,17 @@ import React, { useEffect, useState } from "react";
 import { Styled } from "./style";
 import axios from "axios";
 
-import { token, kToken, loginState, loginModal, pickpoint, placelist, usersArea, usersSigg } from "../../recoil/recoil";
+import {
+  token,
+  kToken,
+  loginState,
+  loginModal,
+  pickpoint,
+  placelist,
+  usersArea,
+  usersSigg,
+  accesstoken,
+} from "../../recoil/recoil";
 import { useRecoilValue, useSetRecoilState, useRecoilState } from "recoil";
 
 import HashTagTemplate from "../HashTagTemplate/HashTagTemplate";
@@ -11,8 +21,7 @@ import LikeLoading from "../Loading/LikeLoading";
 
 function PlaceCards({ title, img, addr1, onClick, contentId, tag }) {
   const placeList = useRecoilValue(placelist);
-  const accessToken = useRecoilValue(token);
-  const kakaoToken = useRecoilValue(kToken);
+  const [accessToken, setAccessToken] = useRecoilState(accesstoken);
   const [tags, setTags] = useState([]);
   const [like, setLike] = useState(0); //나중에 서버로부터 받아오게 된다.
   const [likeOrNot, setLikeOrNot] = useState(false); //이것도 서버에서 받아와야함
@@ -25,7 +34,7 @@ function PlaceCards({ title, img, addr1, onClick, contentId, tag }) {
     axios
       .get(`${process.env.REACT_APP_API_URL}/like/${contentId}`, {
         headers: {
-          // Authorization: `Bearer ${cookies.get("jwt") || cookies.get("kakao-jwt")}`,
+          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         withCredentials: true,
@@ -62,7 +71,7 @@ function PlaceCards({ title, img, addr1, onClick, contentId, tag }) {
     axios
       .get(`${process.env.REACT_APP_API_URL}/post/${contentId}`, {
         headers: {
-          // Authorization: `Bearer ${cookies.get("jwt") || cookies.get("kakao-jwt")}`,
+          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         withCredentials: true,
@@ -91,7 +100,7 @@ function PlaceCards({ title, img, addr1, onClick, contentId, tag }) {
           {},
           {
             headers: {
-              // Authorization: `Bearer ${cookies.get("jwt") || cookies.get("kakao-jwt")}`,
+              Authorization: `Bearer ${accessToken}`,
               "Content-Type": "application/json",
             },
             withCredentials: true,
@@ -112,7 +121,7 @@ function PlaceCards({ title, img, addr1, onClick, contentId, tag }) {
       axios
         .delete(`${process.env.REACT_APP_API_URL}/like/${contentId}`, {
           headers: {
-            // Authorization: `Bearer ${cookies.get("jwt") || cookies.get("kakao-jwt")}`,
+            Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json",
           },
           withCredentials: true,

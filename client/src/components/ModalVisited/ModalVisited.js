@@ -9,14 +9,14 @@ import {
   kToken,
   newVisitedPlace,
   deleteCommentmode,
+  accesstoken,
 } from "../../recoil/recoil";
 import { Styled } from "./style";
 import VisitedUpload from "../VisitedUpload/VisitedUpload";
 import { toast } from "react-toastify";
 
 function ModalVisited({ id, kmemo, visitedImg, setPrevList }) {
-  const accessToken = useRecoilValue(token);
-  const kakaoToken = useRecoilValue(kToken);
+  const [accessToken, setAccessToken] = useRecoilState(accesstoken);
   const [isVisitedPlaceOpen, setIsVisitedPlaceOpen] = useRecoilState(visitedModal);
   const [image, setImage] = useState(""); //전역으로 바꿀수도
   const [memo, setMemo] = useState(kmemo); //마찬가지 전역으로 바꿀수도
@@ -46,7 +46,7 @@ function ModalVisited({ id, kmemo, visitedImg, setPrevList }) {
       .patch(`${process.env.REACT_APP_API_URL}/visited`, formData, {
         params: { visitedId: id },
         headers: {
-          Authorization: `Bearer ${accessToken || kakaoToken}`,
+          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         withCredentials: true,

@@ -11,6 +11,7 @@ import {
   canSearchPlace,
   setPlacelistLoading,
   usersaddress,
+  accesstoken,
 } from "../../recoil/recoil";
 
 import { useHistory } from "react-router-dom";
@@ -42,6 +43,7 @@ const HomeMap = () => {
   // const [map, setMap] = useState(null);
 
   const getWtm = useRecoilValueLoadable(getWTM);
+  const [accessToken, setAccessToken] = useRecoilState(accesstoken);
 
   //!!클릭한 곳을 pickPoint에 할당할 것, 초기값은 사용자 위치.
 
@@ -65,7 +67,7 @@ const HomeMap = () => {
     axios
       .get(`${process.env.REACT_APP_API_URL}/home`, {
         headers: {
-          // Authorization: `Bearer ${accessToken || kakaoToken}`,
+          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         params: {

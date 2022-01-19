@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 
-import { useSetRecoilState } from "recoil";
-import { token } from "../recoil/recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { accesstoken } from "../recoil/recoil";
 import Loading from "./Loading/Loading";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
@@ -9,7 +9,7 @@ import axios from "axios";
 const KakaoRedirectHandler = () => {
   // 인가코드
   let code = new URL(window.location.href).searchParams.get("code");
-  const setAccessToken = useSetRecoilState(token);
+  const [accessToken, setAccessToken] = useRecoilState(accesstoken);
   const history = useHistory();
 
   useEffect(async () => {

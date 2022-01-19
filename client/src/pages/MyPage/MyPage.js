@@ -3,7 +3,7 @@ import { Route, Switch } from "react-router-dom";
 import { Styled } from "./style";
 import { useHistory } from "react-router-dom";
 import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
-import { token, kToken, loginState, loginAgainModal } from "../../recoil/recoil";
+import { token, kToken, loginState, loginAgainModal, accesstoken } from "../../recoil/recoil";
 import styled from "styled-components";
 
 import axios from "axios";
@@ -15,7 +15,7 @@ const MyPage = ({ match }) => {
   const [imgUrl, setImgUrl] = useState("/images/men.png");
   const [prevImg, setPrevImg] = useState("/images/men.png");
   const [nickname, setNickname] = useState("");
-
+  const [accessToken, setAccessToken] = useRecoilState(accesstoken);
   const [loading, setLoading] = useState(false);
 
   const setIsLoginAgainOpen = useSetRecoilState(loginAgainModal);
@@ -72,7 +72,7 @@ const MyPage = ({ match }) => {
         .get(`${process.env.REACT_APP_API_URL}/user/info`, {
           headers: {
             // Authorization: `Bearer ${cookies.get("jwt") || cookies.get("kakao-jwt")}`,
-            // Authorization: `Bearer ${accessToken || kakaoToken}`,
+            Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json",
           },
           withCredentials: true,

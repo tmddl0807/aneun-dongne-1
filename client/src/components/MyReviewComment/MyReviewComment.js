@@ -1,7 +1,7 @@
 import React from "react";
 import { useHistory } from "react-router-dom";
 import { useRecoilValue, useRecoilState } from "recoil";
-import { token, kToken, deleteCommentModal, commentPostId, commentUniqueId } from "../../recoil/recoil";
+import { token, kToken, deleteCommentModal, commentPostId, commentUniqueId, accesstoken } from "../../recoil/recoil";
 
 import { Icon } from "react-icons-kit";
 import { ic_cancel_outline } from "react-icons-kit/md/ic_cancel_outline";
@@ -12,7 +12,7 @@ import Cookies from "universal-cookie";
 import ModalDeleteComment from "../ModalDeleteComment/ModalDeleteComment";
 
 const MyReviewComment = ({ comment, renderMyComments }) => {
-  const accessToken = useRecoilValue(token);
+  const [accessToken, setAccessToken] = useRecoilState(accesstoken);
   const kakaoToken = useRecoilValue(kToken);
 
   const [isDeleteModal, setIsDeleteModal] = useRecoilState(deleteCommentModal);

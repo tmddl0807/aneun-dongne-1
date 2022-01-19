@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useRecoilState, useSetRecoilState, useRecoilValue } from "recoil";
-import { loginAgainModal, token, kToken, warningDeleteUserModal } from "../../recoil/recoil";
+import { loginAgainModal, token, kToken, warningDeleteUserModal, accesstoken } from "../../recoil/recoil";
 import { Styled } from "./style";
 import { message } from "../../modules/message";
 import ProfileUpload from "../../components/UploadImage/ProfileUpload";
@@ -18,8 +18,7 @@ function Profile({ imgUrl, setImgUrl, setPrevImg, setNickname }) {
   const [inputCheckPassword, setInputCheckPassword] = useState("");
   const cookies = new Cookies();
 
-  const [accessToken, setAccessToken] = useRecoilState(token);
-  const kakaoToken = useRecoilValue(kToken);
+  const [accessToken, setAccessToken] = useRecoilState(accesstoken);
   const [errorMessage, setErrorMessage] = useState("");
   const setWarningModal = useSetRecoilState(warningDeleteUserModal);
   useEffect(() => {
@@ -30,8 +29,7 @@ function Profile({ imgUrl, setImgUrl, setPrevImg, setNickname }) {
     axios
       .get(`${process.env.REACT_APP_API_URL}/user/info`, {
         headers: {
-          Authorization: `Bearer ${cookies.get("jwt") || cookies.get("kakao-jwt")}`,
-          // Authorization: `Bearer ${accessToken || kakaoToken}`,
+          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         withCredentials: true,

@@ -1,14 +1,13 @@
 import React from "react";
 import { Styled } from "./style";
-import { warningDeleteUserModal, loginState, token, kToken } from "../../recoil/recoil";
+import { warningDeleteUserModal, loginState, token, kToken, accesstoken } from "../../recoil/recoil";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
 function WarningDeleteUserModal() {
   const [isWarningModal, setWarningModal] = useRecoilState(warningDeleteUserModal);
   const [isLogin, setIsLogin] = useRecoilState(loginState);
-  const [accessToken, setAccessToken] = useRecoilState(token);
-  const kakaoToken = useRecoilValue(kToken);
+  const [accessToken, setAccessToken] = useRecoilState(accesstoken);
   const history = useHistory();
 
   //회원탈퇴
@@ -16,7 +15,7 @@ function WarningDeleteUserModal() {
     axios
       .delete(`${process.env.REACT_APP_API_URL}/user/info`, {
         headers: {
-          // Authorization: `Bearer ${accessToken || kakaoToken}`,
+          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
         withCredentials: true,
